@@ -11,7 +11,8 @@ env:
 
 permissions:
   id-token: write # Required for OIDC
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   publish-npm:
@@ -19,11 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Let Changesets configure authentication for Git pushes.
+          persist-credentials: false
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registry-url: "https://registry.npmjs.org"
 
       - run: |
@@ -32,12 +36,12 @@ jobs:
 
       # Ensure npm 11.5.1 or later is installed (for trusted publishing)
       - name: Update npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
+          github-token: ${{ github.token }}
+          version: pnpm exec changeset version && pnpm install --lockfile-only --no-frozen-lockfile
           publish: pnpm publish -r --access public
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
