@@ -39,7 +39,7 @@
     },
     "homepage": "https://github.com/swc-project/pkgs",
     "engines": {
-        "node": ">= 20.19.0"
+        "node": "^20.19.0 || >=22"
     },
     "bin": {
         "swc": "./bin/swc.js",
